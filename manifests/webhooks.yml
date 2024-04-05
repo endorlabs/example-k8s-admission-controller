@@ -1,0 +1,27 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: deployment-validation
+webhooks:
+  - name: "deployment-validation.endor.svc"
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values: [ "production" ]
+    rules:
+      - operations: [ "CREATE" ]
+        apiGroups: [ "apps" ]
+        apiVersions: [ "v1" ]
+        resources: [ "deployments" ]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        namespace: endor
+        name: webhook-server
+        path: "/validate"
+      caBundle: ${ENCODED_CA}
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 5

@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-server
+  namespace: endor
+  labels:
+    app: webhook-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-server
+  template:
+    metadata:
+      labels:
+        app: webhook-server
+    spec:
+      containers:
+        - name: webhook-server
+          image: your-repo/your-image:your-version
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/certs
+              readOnly: true
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: endor
+                  key: api-key
+            - name: API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: endor
+                  key: api-secret
+            - name: BASEURL
+              value: "https://api.endorlabs.com"
+            - name: NAMESPACE
+              value: "your namespace"
+            - name: CERTIFICATE_OIDC_ISSUER
+              value: "https://token.actions.githubusercontent.com"
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: webhook-server-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-server
+  namespace: endor
+spec:
+  selector:
+    app: webhook-server
+  ports:
+    - port: 443
+      targetPort: 8443
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: endor
+  name: secret-reader
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: secret-reader-binding
+  namespace: endor
+subjects:
+- kind: ServiceAccount
+  name: webhook-server
+  namespace: endor
+roleRef:
+  kind: Role
+  name: secret-reader
+  apiGroup: rbac.authorization.k8s.io
