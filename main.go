@@ -114,7 +114,7 @@ func serveValidate(w http.ResponseWriter, r *http.Request) {
 
 // Verify all of the containers are signed using Endor API
 func validate(ar admission.AdmissionReview) *admission.AdmissionResponse {
-	log.Info().Msgf("Validating deployments for image digests")
+	log.Info().Msg("Validating deployments for image digests")
 	deploymentResource := metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
 	if ar.Request.Resource != deploymentResource {
 		log.Error().Msgf("expect resource to be %s", deploymentResource)
@@ -134,10 +134,12 @@ func validate(ar admission.AdmissionReview) *admission.AdmissionResponse {
 
 	for _, container := range deployment.Spec.Template.Spec.Containers {
 		if !strings.Contains(container.Image, "@sha256:") {
+			failure := fmt.Sprintf("Container image must include a digest, verification skipped: %s", container.Image)
+			log.Warn().Msg(failure)
 			return &admission.AdmissionResponse{
 				Allowed: false,
 				Result: &metav1.Status{
-					Message: "Container image must include a digest: " + container.Image,
+					Message: failure,
 				},
 			}
 		}
@@ -145,12 +147,16 @@ func validate(ar admission.AdmissionReview) *admission.AdmissionResponse {
 		// Verify the image signature using the digest
 		imageVerified, err := verifyImageSignature(container.Image)
 		if !imageVerified {
+			failure := fmt.Sprintf("Container image signature verification failed for the image %s, with reason: %s", container.Image, err.Error())
+			log.Warn().Msg(failure)
 			return &admission.AdmissionResponse{
 				Allowed: false,
 				Result: &metav1.Status{
-					Message: fmt.Sprintf("Container image signature verification failed for the image %s, with reason: %s", container.Image, err),
+					Message: failure,
 				},
 			}
+		} else {
+			log.Info().Msgf("%s successfully verified with Endor Labs", container.Image)
 		}
 	}
 
