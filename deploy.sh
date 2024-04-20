@@ -9,14 +9,14 @@ else
 fi
 
 if [ ! -f certs/tls.crt ]; then
-    openssl req -new -key certs/tls.key -out certs/tls.csr -subj "/CN=webhook-server.endor.svc"
-    openssl x509 -req -extfile <(printf "subjectAltName=DNS:webhook-server.endor.svc") -in certs/tls.csr -signkey certs/tls.key -out certs/tls.crt
+    openssl req -new -key certs/tls.key -out certs/tls.csr -subj "/CN=webhook-server.endorlabs-tutorial.svc"
+    openssl x509 -req -extfile <(printf "subjectAltName=DNS:webhook-server.endorlabs-tutorial.svc") -in certs/tls.csr -signkey certs/tls.key -out certs/tls.crt
 else
     echo "TLS certificate already exists."
 fi
 
-echo "Creating namespace endor"
-kubectl get namespace endor || kubectl create namespace endor
+echo "Creating namespace endorlabs-tutorial"
+kubectl get namespace endorlabs-tutorial || kubectl create namespace endorlabs-tutorial
 kubectl apply -f manifests/secrets.yml
 kubectl apply -f manifests/webhook_server.yml
 
@@ -26,7 +26,7 @@ kubectl get namespace production || kubectl create namespace production
 echo "Creating Webhook Server TLS Secret"
 kubectl create secret tls webhook-server-tls \
     --cert "certs/tls.crt" \
-    --key "certs/tls.key" -n endor --dry-run=client -o yaml | kubectl apply -f -
+    --key "certs/tls.key" -n endorlabs-tutorial --dry-run=client -o yaml | kubectl apply -f -
 
 echo "Creating K8s Webhooks"
 ENCODED_CA=$(cat certs/tls.crt | base64 | tr -d '\n')

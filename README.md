@@ -14,7 +14,7 @@ By using this software, you acknowledge that you have read this disclaimer, unde
 
 ## Limitations
 
-- The webhook server is deployed to a hardcoded namespace called "endor"
+- The webhook server is deployed to a hardcoded namespace called "endorlabs-tutorial"
 - The controller only targets a hardcoded Kubernetes namespace called "production"
 - The controller only validates images which have been signed within a GitHub pipeline using OIDC authentication
 - Deployment images must include the hash (tags are not supported), therefore container images should be in the format `IMAGE_NAME@sha256:SHA`
@@ -45,7 +45,7 @@ By using this software, you acknowledge that you have read this disclaimer, unde
 1. Run the script `./deploy.sh` which performs the following functions:
     1. Generates TLS certificates to securely communicate with the Kubernetes API server
     1. Creates Kubernetes secrets using your Endor API credentials
-    1. Creates the webhook server in a namespace called "endor"
+    1. Creates the webhook server in a namespace called "endorlabs-tutorial"
     1. Deploys the admission controller webhook to verify if images are signed in a namespace called "production"
 
 ## Usage
@@ -65,7 +65,7 @@ Attempt to deploy a signed and non-signed image to the "prodution" namespace in 
 
 For a failure you should see:
 
-> Error from server: error when creating "examples/nginx-unsigned-image.yml": admission webhook "deployment-validation.endor.svc" denied the request: Container image signature verification failed for the image \<your image>, with reason: API request failed with status code 500: {"code":13, "message":"Unable to verify certificate: no matching signatures", "details":...
+> Error from server: error when creating "examples/nginx-unsigned-image.yml": admission webhook "deployment-validation.endorlabs-tutorial.svc" denied the request: Container image signature verification failed for the image \<your image>, with reason: API request failed with status code 500: {"code":13, "message":"Unable to verify certificate: no matching signatures", "details":...
 
 ## Future Improvements
 
@@ -82,8 +82,8 @@ Key limitations include:
 The Admission Controller logs its operations, including the details of the validation process and any errors encountered during signature verification. Check the webhook server logs for insights into its operation and troubleshooting information:
 
 ```
-kubectl get pods -n endor
-kubectl logs <pod name> -n endor
+kubectl get pods -n endorlabs-tutorial
+kubectl logs <pod name> -n endorlabs-tutorial
 ```
 
 ## Security Considerations

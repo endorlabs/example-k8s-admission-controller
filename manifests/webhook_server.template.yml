@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: webhook-server
-  namespace: endor
+  namespace: endorlabs-tutorial
   labels:
     app: webhook-server
 spec:
@@ -51,7 +51,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: webhook-server
-  namespace: endor
+  namespace: endorlabs-tutorial
 spec:
   selector:
     app: webhook-server
@@ -62,7 +62,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: endor
+  namespace: endorlabs-tutorial
   name: secret-reader
 rules:
 - apiGroups: [""]
@@ -73,11 +73,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: secret-reader-binding
-  namespace: endor
+  namespace: endorlabs-tutorial
 subjects:
 - kind: ServiceAccount
   name: webhook-server
-  namespace: endor
+  namespace: endorlabs-tutorial
 roleRef:
   kind: Role
   name: secret-reader

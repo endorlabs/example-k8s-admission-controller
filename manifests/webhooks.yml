@@ -4,7 +4,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: deployment-validation
 webhooks:
-  - name: "deployment-validation.endor.svc"
+  - name: "deployment-validation.endorlabs-tutorial.svc"
     namespaceSelector:
       matchExpressions:
         - key: kubernetes.io/metadata.name
@@ -18,7 +18,7 @@ webhooks:
         scope: "Namespaced"
     clientConfig:
       service:
-        namespace: endor
+        namespace: endorlabs-tutorial
         name: webhook-server
         path: "/validate"
       caBundle: ${ENCODED_CA}
