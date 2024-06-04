@@ -65,7 +65,29 @@ Attempt to deploy a signed and non-signed image to the "prodution" namespace in 
 
 For a failure you should see:
 
-> Error from server: error when creating "examples/nginx-unsigned-image.yml": admission webhook "deployment-validation.endorlabs-tutorial.svc" denied the request: Container image signature verification failed for the image \<your image>, with reason: API request failed with status code 500: {"code":13, "message":"Unable to verify certificate: no matching signatures", "details":...
+> Error from server: error when creating "examples/nginx-unsigned-image.yml": admission webhook "deployment-validation.endorlabs-tutorial.svc" denied the request: Container image signature verification failed for the image \<your image>, with reason: verification failed with result: unable to find signature entry for given artifact
+
+## Return codes
+
+The list of return codes is shown here:
+
+| Code   | Description |
+| ------ | ----------- |
+| ARTIFACT_OPERATION_RESULT_UNSPECIFIED | "unspecified error" |
+| ARTIFACT_OPERATION_RESULT_SUCCESS | "successful operation" |
+| ARTIFACT_OPERATION_RESULT_NO_ARTIFACT| "no such artifact" |
+| ARTIFACT_OPERATION_RESULT_NO_SIGNATURE | "unable to find signature entry f|or given artifact" |
+| ARTIFACT_OPERATION_RESULT_TIME_MISMATCH | "timestamp does not match the certificate's validity" |
+| ARTIFACT_OPERATION_RESULT_INVALID_SIGNATURE| "unable to verify signature" |
+| ARTIFACT_OPERATION_RESULT_UNKNOWN_CA | "unknown certificate authority (CA)" |
+| ARTIFACT_OPERATION_RESULT_REVOKED_SIGNATURE | "the signature for this artifact and source repository reference has been revoked" |
+| ARTIFACT_OPERATION_RESULT_CLAIMS_MISMATCH | "provided provenance information does not match with signature entry" |
+| ARTIFACT_OPERATION_RESULT_BAD_CERTIFICATE | "bad certificate" |
+| ARTIFACT_OPERATION_RESULT_INVALID_KEY_TYPE | "unable to extract public key from certificate" |
+| ARTIFACT_OPERATION_RESULT_CORRUPTED_SIGNATURE | "unable to decode signature" |
+| ARTIFACT_OPERATION_RESULT_KEY_GEN_FAILURE | "unable to generate private key" |
+| ARTIFACT_OPERATION_RESULT_CSR_GEN_FAILURE | "unable to create certificate signing request" |
+| ARTIFACT_OPERATION_RESULT_SIGN_FAILURE | "unable to sign artifact" |
 
 ## Future Improvements
 
@@ -73,7 +95,6 @@ This Admission Controller is designed as a demonstrative example and *is not int
 
 Key limitations include:
 
-- The Endor API currently returns an incorrect HTTP 500 status code for unverified artifacts, this is being tracked under [CSE-1010](https://endorlabs.atlassian.net/browse/CSE-1010)
 - The current implementation does not cache or store verification results, potentially leading to redundant verification requests for the same image
 - Error handling and logging are basic and may not cover all edge cases or provide enough information for debugging in complex scenarios
 

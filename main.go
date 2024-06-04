@@ -228,7 +228,7 @@ func verifyImageSignature(imageName string) (bool, error) {
 	}
 
 	// Check if the response was successful
-	if apiResponse.Response.Result == "VERIFICATION_RESULT_SUCCESS" {
+	if apiResponse.Response.Result == "ARTIFACT_OPERATION_RESULT_SUCCESS" {
 		log.Info().Msg("Verification result was successful")
 		return true, nil
 	} else {
