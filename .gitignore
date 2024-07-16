@@ -22,3 +22,4 @@ examples/
 build.sh
 webhook_server.yml
 secrets.yml
+clear-minikube.sh
